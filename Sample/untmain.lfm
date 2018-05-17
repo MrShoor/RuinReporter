@@ -1,0 +1,19 @@
+object frmMain: TfrmMain
+  Left = 457
+  Height = 394
+  Top = 250
+  Width = 619
+  Caption = 'frmMain'
+  ClientHeight = 394
+  ClientWidth = 619
+  LCLVersion = '1.8.0.3'
+  object btnMyException: TButton
+    Left = 8
+    Height = 25
+    Top = 8
+    Width = 104
+    Caption = 'MyException'
+    OnClick = btnMyExceptionClick
+    TabOrder = 0
+  end
+end
