@@ -131,12 +131,12 @@ begin
 
   path := GetApplicationStoragePath();
   path := path + '\' + RuinR_AppName;
-  if not DirectoryExists(path) then
+  wpath := UnicodeString(path);
+  if not DirectoryExists(wpath) then
   begin
-    wpath := UnicodeString(path);
     if not CreateDir(wpath) then
     begin
-      DisplayMessage('Unable to create directory: "' + wpath + '"');
+      DisplayMessage('Unable to create directory: "' + path + '"');
       Exit;
     end;
   end;
