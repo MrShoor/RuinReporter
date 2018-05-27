@@ -18,7 +18,7 @@ begin
   RuinR_AppName := 'RuinR_Demo';
   RuinR_Mode := rrmHTTP;
   RuinR_UserID := 'Demo_User';
-  RuinR_HTTPServer := 'your_server.com';
+  RuinR_HTTPServer := 'your_server';
 
   RequireDerivedFormResource := True;
   Application.OnException := @RuinR_AppHandler.OnException;

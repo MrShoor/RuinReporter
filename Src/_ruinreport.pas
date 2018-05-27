@@ -15,6 +15,13 @@ implementation
 
 uses Classes, SysUtils, Windows, RuinR;
 
+procedure DisplayMessage(const s: string);
+var ws: WideString;
+begin
+  ws := WideString(s);
+  MessageBoxW(0, PWideChar(ws), 'Report error', MB_OK or MB_ICONERROR);
+end;
+
 function BuildReport(Obj: TObject; Addr: CodePointer; FrameCount: Longint; Frame: PCodePointer): TReport;
 var
   i: Integer;
@@ -51,21 +58,37 @@ begin
   connect_handle := nil;
   try
     int_handle := InternetOpen(PChar(agent), INTERNET_OPEN_TYPE_DIRECT, nil, nil, 0);
-    if (int_handle = nil) then Exit;
+    if (int_handle = nil) then
+    begin
+      DisplayMessage('Unable to open conneciton');
+      Exit;
+    end;
 
     connect_handle := InternetConnect(int_handle, PChar(host), 80, nil, nil, INTERNET_SERVICE_HTTP, 0, 0);
-    if (connect_handle = nil) then Exit;
+    if (connect_handle = nil) then
+    begin
+      DisplayMessage('Report server not available');
+      Exit;
+    end;
 
     accept[0] := '*/*';
     accept[1] := '';
 
     request_handle := HttpOpenRequest(connect_handle, 'POST', PChar(url), nil, nil, @accept[0], 0, 1);
-    if (request_handle = nil) then Exit;
+    if (request_handle = nil) then
+    begin
+      DisplayMessage('Unable to open HTTP request');
+      Exit;
+    end;
 
     header := 'Content-Type: application/x-www-form-urlencoded' + sLineBreak + 'Content-Length: ';
     header := header + IntToStr(Length(data)) + sLineBreak;
 
-    if not HttpSendRequest(request_handle, PChar(header), Length(header), PChar(data), Length(data)) then Exit;
+    if not HttpSendRequest(request_handle, PChar(header), Length(header), PChar(data), Length(data)) then
+    begin
+      DisplayMessage('Report not sended');
+      Exit;
+    end;
 
     SetLength(tmpbuffer, 1024);
     bytesread := 1024;
@@ -74,7 +97,7 @@ begin
       alltxt := alltxt + Copy(tmpbuffer, 1, bytesread);
 
     if alltxt <> 'OK' then
-      MessageBox(0, PChar(alltxt), 'Report error', MB_OK or MB_ICONERROR);
+      DisplayMessage(alltxt);
   finally
     if (request_handle) <> nil then InternetCloseHandle(request_handle);
     if (connect_handle) <> nil then InternetCloseHandle(connect_handle);
@@ -84,7 +107,7 @@ end;
 
 procedure SendReport_HTTP(const AReport: TReport);
 begin
-  HTTP_Post('RuinReporter v0.1', 'rareeditor.com', 'test.php', 'data='+AReport.ToJSON());
+  HTTP_Post('RuinReporter v0.1', RuinR_HTTPServer, RuinR_HTTPPage, 'data='+AReport.ToJSON());
 end;
 
 function GetApplicationStoragePath: string;
@@ -102,7 +125,7 @@ begin
   Result := '';
   if RuinR_AppName = '' then
   begin
-    MessageBoxW(0, 'RuinR_AppName not defined', 'Report error', MB_OK or MB_ICONERROR);
+    DisplayMessage('RuinR_AppName not defined');
     Exit;
   end;
 
@@ -113,8 +136,7 @@ begin
     wpath := UnicodeString(path);
     if not CreateDir(wpath) then
     begin
-      wpath := 'Unable to create directory: "' + wpath + '"';
-      MessageBoxW(0, PWideChar(wpath), 'Report error', MB_OK or MB_ICONERROR);
+      DisplayMessage('Unable to create directory: "' + wpath + '"');
       Exit;
     end;
   end;
@@ -135,8 +157,8 @@ begin
     try
       sl.SaveToFile(targetfile);
     except
-      on e: EFCreateError do MessageBoxW(0, 'Unable to create report file', 'Report error', MB_OK or MB_ICONERROR);
-      on e: EFOpenError do MessageBoxW(0, 'Unable to open report file', 'Report error', MB_OK or MB_ICONERROR);
+      on e: EFCreateError do DisplayMessage('Unable to create report file');
+      on e: EFOpenError do DisplayMessage('Unable to open report file');
     end;
   finally
     FreeAndNil(sl);
