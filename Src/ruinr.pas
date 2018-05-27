@@ -14,13 +14,20 @@ type
     procedure OnException(Sender : TObject; E: Exception);
   end;
 
-var RuinR_Mode : TRuinReportMode;
+var RuinR_AppName: string;
+var RuinR_Mode   : TRuinReportMode;
+
+var RuinR_HTTPServer: string;
+var RuinR_HTTPPage  : string;
+
+var RuinR_UserID : string;
 
 function RuinR_AppHandler: TApplicationExceptionHandler;
 
 implementation
 
 uses
+  Windows,
   _RuinTypes, _RuinReport;
 
 var
@@ -33,9 +40,14 @@ begin
 
   report := BuildReport(Obj, Addr, FrameCount, Frame);
   case RuinR_Mode of
+    rrmFile:
+        SaveReportToFile(report);
     rrmHTTP:
         SendReport_HTTP(report);
   end;
+
+  MessageBox(0, 'Encountered error. Application will be closed.', 'Sorry', MB_OK or MB_ICONERROR);
+  Halt(-1);
 end;
 
 procedure DummyExceptProc(Obj : TObject; Addr : CodePointer; FrameCount:Longint; Frame: PCodePointer);
@@ -58,6 +70,7 @@ end;
 initialization
   ExceptProc := @RuinExceptProc;
   GV_AppHandler := TApplicationExceptionHandler.Create;
+  RuinR_HTTPPage := 'report.php';
 
 finalization
   ExceptProc := @DummyExceptProc;

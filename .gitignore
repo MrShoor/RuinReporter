@@ -69,3 +69,4 @@ __recovery/
 *.bak
 *.lps
 x86_64-win64
+/Src/web/nbproject/private/
