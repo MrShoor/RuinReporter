@@ -16,7 +16,7 @@ uses
 
 begin
   RuinR_AppName := 'RuinR_Demo';
-  RuinR_Mode := rrmHTTP;
+  RuinR_Mode := rrmFile;
   RuinR_UserID := 'Demo_User';
   RuinR_HTTPServer := 'your_server';
 
