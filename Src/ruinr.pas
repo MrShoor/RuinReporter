@@ -47,7 +47,7 @@ begin
   end;
 
   MessageBox(0, 'Encountered error. Application will be closed.', 'Sorry', MB_OK or MB_ICONERROR);
-  Halt(-1);
+  ExitProcess(1);
 end;
 
 procedure DummyExceptProc(Obj : TObject; Addr : CodePointer; FrameCount:Longint; Frame: PCodePointer);
