@@ -9,7 +9,7 @@ uses
 
 function  BuildReport(Obj : TObject; Addr : CodePointer; FrameCount:Longint; Frame: PCodePointer): TReport;
 procedure SendReport_HTTP(const AReport: TReport);
-procedure SaveReportToFile(const AReport: TReport);
+procedure SaveReportToFile(const AReport: TReport; out AFileName: string);
 
 implementation
 
@@ -144,11 +144,12 @@ begin
   Result := path + filepart;
 end;
 
-procedure SaveReportToFile(const AReport: TReport);
+procedure SaveReportToFile(const AReport: TReport; out AFileName: string);
 var sl: TStringList;
     targetfile: string;
 begin
   targetfile := GenerateFileName();
+  AFileName := targetfile;
   if targetfile = '' then Exit;
 
   sl := TStringList.Create;

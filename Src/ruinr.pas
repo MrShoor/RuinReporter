@@ -38,7 +38,9 @@ var
 procedure RuinExceptProc(Obj : TObject; Addr : CodePointer; FrameCount:Longint; Frame: PCodePointer);
 var report: TReport;
     msg: UnicodeString;
+    fname: string;
 begin
+  fname := '';
   RuinR_InCrash := True;
 
   if RuinR_Mode = rrmNone then Exit;
@@ -46,7 +48,7 @@ begin
   report := BuildReport(Obj, Addr, FrameCount, Frame);
   case RuinR_Mode of
     rrmFile:
-        SaveReportToFile(report);
+        SaveReportToFile(report, fname);
     rrmHTTP:
         SendReport_HTTP(report);
   end;
@@ -55,6 +57,8 @@ begin
   msg := msg + UnicodeString(Obj.ClassName);
   if Obj is Exception then
     msg := msg + ': "' + UnicodeString(Exception(Obj).Message) + '"';
+  if fname <> '' then
+    msg := msg + sLineBreak + sLineBreak + 'Report saved at: ' + fname;
   MessageBoxW(0, PWideChar(msg), 'Sorry', MB_OK or MB_ICONERROR);
   ExitProcess(1);
 end;
